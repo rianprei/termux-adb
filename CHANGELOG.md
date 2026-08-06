@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.1.0] - 2026-08-06
+
+### Adicionado
+- `install.sh`: symlinks `adb` → `termux-adb` e `fastboot` → `termux-fastboot` (digita só `adb`)
+- `termux-adb-update.sh`: NOVO — auto-updater que checa e atualiza scripts + pacote
+- `install.sh`: instala `termux-adb-update` no PATH
+- `uninstall.sh`: remove symlinks `adb`/`fastboot` e `termux-adb-update`
+- Crédito ao offici5l pelo conceito de symlinks e auto-updater
+
 ## [3.0.0] - 2026-08-06
 
 ### Adicionado
