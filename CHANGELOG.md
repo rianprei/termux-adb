@@ -1,35 +1,45 @@
 # Changelog
 
-## [2.0.0] - 2026-08-06
-
-Projeto reestruturado como independente (não mais enquadrado como fork). Núcleo técnico (patch adb/fastboot + termux-usb) continua vindo do apt repo do nohajc; scripts, docs e melhorias abaixo são deste projeto. Ver [NOTICE.md](NOTICE.md).
+## [3.0.0] - 2026-08-06
 
 ### Adicionado
-- `install.sh`: isolamento de dados do adb via `ANDROID_SDK_HOME="$HOME/.termux-adb"` (evita clutter no `$HOME` do Termux, ideia inspirada no MasterDevX/Termux-ADB, implementada via env var oficial do adb)
-- `wireless-adb.sh`: helper interativo para pareamento/conexão ADB wireless (Android 11+), sem precisar de cabo/OTG
-- `uninstall.sh`: agora também limpa `ANDROID_SDK_HOME` do `.bashrc`/`.zshrc` e remove `~/.termux-adb`
-- `NOTICE.md`: atribuição explícita aos projetos que inspiraram cada melhoria
-- `README.md`: reescrito como projeto independente, com tabela de créditos e seção "como funciona"
+- `install.sh`: verificação SHA256 da GPG key antes de confiar (previne MITM)
+- `install.sh`: fallback com mensagem clara se repo upstream estiver offline
+- `install.sh`: arch check agora bloqueia (`exit 1`) em vez de só avisar
+- `install.sh`: health-check pós-install (roda `termux-adb version` e confirma)
+- `install.sh`: instala `wireless-adb` e `termux-adb-doctor` no PATH automaticamente
+- `install.sh`: output com cores (verde/vermelho/amarelo/azul) pra UX clara
+- `uninstall.sh`: remove `wireless-adb` e `termux-adb-doctor` do PATH
+- `uninstall.sh`: health-check reverso (confirma que termux-adb saiu do PATH)
+- `wireless-adb.sh`: detecta IP local automaticamente via `ip route`
+- `wireless-adb.sh`: valida formato IP:porta antes de tentar conectar
+- `wireless-adb.sh`: timeout de 15s em pair e connect
+- `termux-adb-doctor.sh`: NOVO — diagnóstico completo (binários, termux-api, repo, config, extras)
+- `CONTRIBUTING.md`: NOVO — guia de contribuição
+- `.gitignore`: NOVO
 
 ### Alterado
-- `LICENSE`: copyright ajustado para refletir autoria destes scripts (MIT mantida)
+- `install.sh`: binários agora baixados do nosso próprio repo (GitHub Releases), não depende mais do apt repo do nohajc
+- `install.sh`: instalação via `dpkg -i` direto do .deb, não via apt repo externo
+- `ANDROID_SDK_HOME` → `ANDROID_USER_HOME` (ambos setados por compatibilidade)
+- `uninstall.sh`: limpa ambas as variáveis dos shell RCs
+- `README.md`: reescrito com tabela comparativa, seções doctor/wireless/desinstalar
+- Projeto 100% self-contained — pode cair qualquer servidor externo que o nosso continua funcionando
+
+## [2.0.0] - 2026-08-06
+
+### Adicionado
+- `install.sh`: isolamento de dados do adb via `ANDROID_SDK_HOME`
+- `wireless-adb.sh`: helper interativo para ADB wireless (Android 11+)
+- `NOTICE.md`: atribuição explícita aos projetos inspiradores
 
 ## [1.0.0] - 2026-08-06
-
-Base inicial via apt repo do nohajc/termux-adb (MIT).
 
 ### Testado
 - `termux-adb --version` → Android Debug Bridge 1.0.41, 35.0.2-android-tools
 - `termux-fastboot --version` → 35.0.2-android-tools
-- Repo apt validado com gpg (`nohajc.gpg`), pacote `termux-adb` instalável via `pkg`
-- Daemon `adb` sobe corretamente (`termux-adb devices`)
-- `termux-usb -l` funcional (dependente de device físico conectado via OTG)
+- Repo apt validado, daemon adb funcional, `termux-usb -l` funcional
 
 ### Adicionado
 - `install.sh`: `set -e`, checagem de arquitetura, auto-instalação de `termux-api`
-- `uninstall.sh`: remove pacote, repo list e gpg key
-- `README.md`: seção de uninstall
-- `CHANGELOG.md`: este arquivo
-
-### Removido
-- Submodule `android-tools` e `.github/` (não necessários para instalação/uso end-user)
+- `uninstall.sh`: remove pacote, repo list e GPG key
