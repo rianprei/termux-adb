@@ -21,9 +21,12 @@ rm -f "$PREFIX/etc/apt/sources.list.d/termux-adb.list"
 rm -f "$PREFIX/etc/apt/trusted.gpg.d/nohajc.gpg"
 apt-get update -qq
 
-step "Removendo ferramentas extras..."
+step "Removendo symlinks e ferramentas extras..."
+rm -f "$PREFIX/bin/adb"
+rm -f "$PREFIX/bin/fastboot"
 rm -f "$PREFIX/bin/wireless-adb"
 rm -f "$PREFIX/bin/termux-adb-doctor"
+rm -f "$PREFIX/bin/termux-adb-update"
 
 step "Limpando config dos shell RCs..."
 for RC in "$HOME/.bashrc" "$HOME/.zshrc"; do
