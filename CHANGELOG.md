@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.2.0] - 2026-08-06
+
+### Corrigido
+- `README.md`: descricao corrigida — "self-contained" em vez de "repo apt mantido"
+- `README.md`: tabela comparativa — "Auto-updates" em vez de "Updates via apt"
+- `termux-adb-doctor.sh`: checa dpkg + GitHub Releases em vez de apt repo/GPG key (falsos positivos eliminados)
+- `termux-adb-doctor.sh`: adiciona check de symlinks adb/fastboot e termux-adb-update
+- `uninstall.sh`: remove `apt-get update` desnecessario (nao usamos mais apt)
+
 ## [3.1.0] - 2026-08-06
 
 ### Adicionado
