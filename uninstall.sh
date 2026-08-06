@@ -10,16 +10,15 @@ info()  { echo -e "${GREEN}[*]${NC} $1"; }
 step()  { echo -e "${BLUE}[>]${NC} $1"; }
 
 echo
-info "termux-adb uninstaller v3.0.0"
+info "termux-adb uninstaller v3.1.0"
 echo
 
 step "Removendo pacote termux-adb..."
 apt-get --assume-yes remove termux-adb 2>/dev/null || true
 
-step "Removendo repo apt e GPG key..."
+step "Limpando restos de apt (se existirem)..."
 rm -f "$PREFIX/etc/apt/sources.list.d/termux-adb.list"
 rm -f "$PREFIX/etc/apt/trusted.gpg.d/nohajc.gpg"
-apt-get update -qq
 
 step "Removendo symlinks e ferramentas extras..."
 rm -f "$PREFIX/bin/adb"
