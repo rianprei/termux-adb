@@ -6,7 +6,7 @@ ARCH="$(uname -m)"
 case " $SUPPORTED_ARCHS " in
   *" $ARCH "*) ;;
   *)
-    echo "Arquitetura '$ARCH' pode nao ser suportada pelo repo termux-adb." >&2
+    echo "Arquitetura '$ARCH' pode nao ser suportada." >&2
     echo "Arquiteturas conhecidas: $SUPPORTED_ARCHS" >&2
     ;;
 esac
@@ -27,9 +27,18 @@ if [ ! -f "$PREFIX/etc/apt/sources.list.d/termux-adb.list" ]; then
   wget -qP "$PREFIX/etc/apt/trusted.gpg.d" https://nohajc.github.io/nohajc.gpg
   apt update
 else
-  echo "Repo already installed"
+  echo "Repo ja instalado"
 fi
 
 apt-get --assume-yes install termux-adb
+
+# Isola dados do adb (~/.android) fora do $HOME do Termux
+mkdir -p "$HOME/.termux-adb"
+for RC in "$HOME/.bashrc" "$HOME/.zshrc"; do
+  [ -f "$RC" ] || continue
+  grep -q "ANDROID_SDK_HOME=.*\.termux-adb" "$RC" 2>/dev/null || \
+    echo 'export ANDROID_SDK_HOME="$HOME/.termux-adb"' >> "$RC"
+done
+export ANDROID_SDK_HOME="$HOME/.termux-adb"
 
 echo "done!"
