@@ -93,8 +93,15 @@ info "Dados do adb isolados em ~/.termux-adb"
 step "Instalando ferramentas extras..."
 wget -qO "$PREFIX/bin/wireless-adb" --timeout=10 "${RAW_URL}/wireless-adb.sh" 2>/dev/null && chmod +x "$PREFIX/bin/wireless-adb" && info "wireless-adb instalado" || warn "Falha ao baixar wireless-adb (nao-critico)"
 wget -qO "$PREFIX/bin/termux-adb-doctor" --timeout=10 "${RAW_URL}/termux-adb-doctor.sh" 2>/dev/null && chmod +x "$PREFIX/bin/termux-adb-doctor" && info "termux-adb-doctor instalado" || warn "Falha ao baixar termux-adb-doctor (nao-critico)"
+wget -qO "$PREFIX/bin/termux-adb-update" --timeout=10 "${RAW_URL}/termux-adb-update.sh" 2>/dev/null && chmod +x "$PREFIX/bin/termux-adb-update" && info "termux-adb-update instalado" || warn "Falha ao baixar termux-adb-update (nao-critico)"
 
-# 7. Health-check
+# 7. Symlinks adb -> termux-adb, fastboot -> termux-fastboot
+step "Criando symlinks..."
+ln -sf "$PREFIX/bin/termux-adb" "$PREFIX/bin/adb"
+ln -sf "$PREFIX/bin/termux-fastboot" "$PREFIX/bin/fastboot"
+info "adb -> termux-adb, fastboot -> termux-fastboot"
+
+# 8. Health-check
 step "Verificando instalacao..."
 echo
 if ADB_VER="$(termux-adb version 2>/dev/null | head -1)"; then
@@ -111,6 +118,6 @@ fi
 
 echo
 info "Instalacao completa!"
-info "Comandos: termux-adb, termux-fastboot, wireless-adb, termux-adb-doctor"
+info "Comandos: adb, fastboot, wireless-adb, termux-adb-doctor, termux-adb-update"
 info "Nenhuma dependencia externa — binarios hospedados no nosso repo."
 echo
