@@ -1,6 +1,6 @@
 # termux-adb
 
-ADB e Fastboot no Termux **sem root**. Repo apt mantido, config isolada, verificação de integridade, wireless mode, diagnóstico integrado, uninstall limpo.
+ADB e Fastboot no Termux **sem root**. 100% self-contained, config isolada, verificação SHA256, wireless mode, diagnóstico integrado, auto-updater, uninstall limpo.
 
 ## Instalação
 
@@ -47,7 +47,7 @@ Guia interativo: detecta seu IP, valida endereços, timeout de 15s em cada passo
 termux-adb-doctor
 ```
 
-Verifica tudo: binários, termux-api, app Termux:API, repo apt, GPG key, config, ferramentas extras. Output verde/vermelho por item.
+Verifica tudo: binários, termux-api, app Termux:API, config isolada, ferramentas extras. Output verde/vermelho por item.
 
 ### Atualizar
 
@@ -74,7 +74,7 @@ O `termux-adb` usa a API `termux-usb` do Termux:API para obter file descriptors 
 | Feature | nohajc | MasterDevX | rendiix | **Este** |
 |---------|--------|-----------|---------|----------|
 | Sem root | ✅ | ❌ | ❌ | ✅ |
-| Updates via apt | ✅ | ❌ | ✅ | ✅ |
+| Auto-updates | ✅ | ❌ | ✅ | ✅ |
 | Uninstall limpo | ❌ | ✅ | ❌ | ✅ |
 | Config isolada | ❌ | ✅ | ❌ | ✅ |
 | Wireless ADB | ❌ | ❌ | ❌ | ✅ |
