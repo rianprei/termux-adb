@@ -12,7 +12,7 @@ warn() { echo -e "  ${YELLOW}!${NC} $1"; }
 ISSUES=0
 
 echo
-echo "termux-adb doctor v3.0.0"
+echo "termux-adb doctor v3.1.0"
 echo "========================"
 echo
 
@@ -48,24 +48,19 @@ else
 fi
 echo
 
-# 3. Repo apt
-echo "Repositorio:"
-if [ -f "$PREFIX/etc/apt/sources.list.d/termux-adb.list" ]; then
-  ok "sources.list presente"
+# 3. Pacote dpkg
+echo "Pacote:"
+if dpkg -s termux-adb >/dev/null 2>&1; then
+  PKG_VER="$(dpkg -s termux-adb 2>/dev/null | grep '^Version:' | cut -d' ' -f2)"
+  ok "termux-adb instalado via dpkg ($PKG_VER)"
 else
-  fail "termux-adb.list nao encontrado em sources.list.d/"
+  fail "pacote termux-adb nao instalado"
 fi
 
-if [ -f "$PREFIX/etc/apt/trusted.gpg.d/nohajc.gpg" ]; then
-  ok "GPG key presente"
+if wget -q --spider --timeout=5 "https://api.github.com/repos/rianprei/termux-adb/releases/latest" 2>/dev/null; then
+  ok "GitHub Releases acessivel"
 else
-  fail "nohajc.gpg nao encontrada em trusted.gpg.d/"
-fi
-
-if wget -q --spider --timeout=5 "https://nohajc.github.io/dists/termux/Release" 2>/dev/null; then
-  ok "repo apt online"
-else
-  fail "repo apt offline ou inacessivel (nohajc.github.io)"
+  warn "GitHub Releases inacessivel (sem internet ou API rate limit)"
 fi
 echo
 
@@ -86,12 +81,28 @@ else
 fi
 echo
 
-# 5. Ferramentas extras
+# 5. Ferramentas extras e symlinks
 echo "Extras:"
-if command -v wireless-adb >/dev/null 2>&1; then
-  ok "wireless-adb instalado"
+for TOOL in wireless-adb termux-adb-update; do
+  if command -v "$TOOL" >/dev/null 2>&1; then
+    ok "$TOOL instalado"
+  else
+    warn "$TOOL nao instalado (rode install.sh para adicionar)"
+  fi
+done
+
+echo
+echo "Symlinks:"
+if [ -L "$PREFIX/bin/adb" ] && [ "$(readlink "$PREFIX/bin/adb")" = "$PREFIX/bin/termux-adb" ]; then
+  ok "adb -> termux-adb"
 else
-  warn "wireless-adb nao instalado (rode install.sh para adicionar)"
+  warn "symlink adb nao encontrado (rode install.sh para criar)"
+fi
+
+if [ -L "$PREFIX/bin/fastboot" ] && [ "$(readlink "$PREFIX/bin/fastboot")" = "$PREFIX/bin/termux-fastboot" ]; then
+  ok "fastboot -> termux-fastboot"
+else
+  warn "symlink fastboot nao encontrado (rode install.sh para criar)"
 fi
 echo
 
