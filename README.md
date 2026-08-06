@@ -1,64 +1,69 @@
-# termux-adb (fork com melhorias)
+# termux-adb
 
-Fork de [nohajc/termux-adb](https://github.com/nohajc/termux-adb), sob licença MIT original.
-Testado e validado 100% funcional em Termux (aarch64) em 2026-08-06 — ver [CHANGELOG.md](CHANGELOG.md).
+ADB e Fastboot no Termux **sem root**, com repo apt mantido (updates via `pkg upgrade`), config isolada do `$HOME`, checagem de arquitetura, auto-instalação do `termux-api`, uninstall limpo e modo wireless (sem cabo OTG).
 
-Run adb and fastboot in Termux without root permissions!
+Testado 100% funcional em Termux (aarch64), 2026-08-06 — ver [CHANGELOG.md](CHANGELOG.md).
 
-## Description
+## Instalação
 
-This is a modified version of adb and fastboot which enables debugging of one Android device from another via USB cable.
-It should work with any USB-C male-to-male cable or the corresponding OTG adapter + cable in case of micro USB.
-
-## Installation
-
-- install Termux from F-Droid
-- install Termux:API from F-Droid
-- in Termux:
-```
-curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
-```
-
-- this will add `termux-adb` apt repository and install the corresponding public gpg key
-- latest version of `termux-adb` and `termux-fastboot` will be installed
-- any future upgrades will be done as part of `pkg upgrade`
-- the script checks your architecture, auto-installs `termux-api` if missing, and stops on any error (`set -e`)
-
-## Uninstall
+- instale Termux e Termux:API (F-Droid)
+- no Termux:
 
 ```
-curl -s https://raw.githubusercontent.com/<seu-usuario>/termux-adb/master/uninstall.sh | bash
+curl -s https://raw.githubusercontent.com/rianprei/termux-adb/main/install.sh | bash
 ```
 
-Removes the `termux-adb` package, the apt repo entry, and the gpg key.
+O script:
+- confere sua arquitetura (`aarch64`, `arm`, `x86_64`, `i686`)
+- instala `termux-api` automaticamente se faltar (necessário pro USB sem root)
+- adiciona o repo apt + chave gpg e instala `termux-adb`/`termux-fastboot`
+- isola os dados do adb (chaves, cache) em `~/.termux-adb`, fora do `$HOME` do Termux
+- para no primeiro erro (`set -e`), nunca finge sucesso
 
-## Usage
+Updates futuros: `pkg upgrade`.
 
-Both `termux-adb` and `termux-fastboot` are drop-in replacements for the original commands so the usage is exactly the same.
-The commands were only renamed to avoid collision with the official `android-tools` Termux package (which contains more tools beside these two).
+## Uso
 
-## Build instructions
+`termux-adb` e `termux-fastboot` são drop-in replacements dos comandos originais — mesma sintaxe do `adb`/`fastboot` padrão. Nomes trocados só pra não colidir com o pacote `android-tools` do Termux.
 
-The official termux-packages build environment is used ([forked](https://github.com/nohajc/termux-packages) to add the `termux-adb` package).
+### USB (cabo/OTG)
 
-For more information, please refer to the Termux documentation:
-- https://github.com/termux/termux-packages/wiki/Build-environment
-- https://github.com/termux/termux-packages/wiki/Building-packages
+```
+termux-adb devices
+```
 
-## Current limitations
+Na primeira execução o Android vai pedir permissão de acesso USB — aceite.
 
-Using `termux-usb` and querying device serial number with `libusb` tends to be slow. That's not a problem for adb which runs as a daemon and scans USB devices periodically. However, it is quite noticeable for `termux-fastboot` commands because fastboot doesn't use any background service. This can potentially be improved in a future release.
+### Wireless (Android 11+, sem cabo)
 
-## How it actually works
+```
+bash wireless-adb.sh
+```
 
-Termux has the `android-tools` package which contains `adb` and `fastboot` but it normally works on rooted devices only.
-This is mainly due to filesystem permissions required by adb when enumerating USB devices (traversing `/dev/bus/usb/*`).
+Guia interativo de pareamento/conexão via depuração wireless.
 
-There is, however, Android API exposed by `termux-usb` utility which gives you a raw file descriptor of any connected USB device after manual approval by the user.
+## Desinstalar
 
-Of course, `adb` by itself doesn't know anything about `termux-usb` nor it can take raw file descriptors from command-line or environment.
-If it cannot access `/dev/bus/usb`, it just won't detect any connected devices. This is where `termux-adb` comes in.
+```
+curl -s https://raw.githubusercontent.com/rianprei/termux-adb/main/uninstall.sh | bash
+```
 
-Both `adb` and `fastboot` are patched to scan for USB devices using the `termux-usb` command. Furthermore a Unix Domain Socket is used to transfer the obtained file descriptors from child process to the parent (i.e. `termux-adb` runs `termux-usb` for every detected device which in turn runs `termux-adb` in a special mode that will only send USB file descriptor to the UDS file descriptor provided by environment variable).
+Remove pacote, repo apt, chave gpg e config isolada (`~/.termux-adb`).
 
-This way we don't complicate the user experience and we can work with any number of devices connected at once (e.g. if you have a USB hub connected to the OTG adapter).
+## Como funciona
+
+Termux tem `android-tools` (adb/fastboot padrão), mas ele só funciona com root — falta permissão de filesystem pra varrer `/dev/bus/usb/*`. O termux-adb usa a API `termux-usb` do Termux:API pra obter o file descriptor de qualquer dispositivo USB conectado, após aprovação manual do usuário. Os binários adb/fastboot são patchados pra pedir esse descriptor via `termux-usb` em vez de acessar `/dev/bus/usb` direto, e um Unix Domain Socket transfere o descriptor entre processos — funciona com qualquer número de dispositivos (ex: hub USB no adaptador OTG).
+
+## Limitações conhecidas
+
+Consultar o serial do dispositivo via `libusb`/`termux-usb` é lento. Isso não afeta o adb (roda como daemon, varre periodicamente), mas é perceptível no fastboot (sem serviço em background).
+
+## Créditos
+
+Este projeto reúne, de forma independente, as melhores ideias do ecossistema de ADB sem root no Termux:
+
+- **[nohajc/termux-adb](https://github.com/nohajc/termux-adb)** — o patch adb/fastboot + `termux-usb` que permite USB sem root, distribuído via apt repo próprio. Núcleo técnico usado aqui.
+- **[MasterDevX/Termux-ADB](https://github.com/MasterDevX/Termux-ADB)** — popularizou a instalação em 1 comando e a ideia de isolar dados do adb fora do `$HOME` (aqui implementado via `ANDROID_SDK_HOME`, oficialmente suportado pelo próprio adb).
+- **[rendiix/termux-adb-fastboot](https://github.com/rendiix/termux-adb-fastboot)** — validou o padrão de distribuição via apt repo + gpg key própria.
+
+Ver [NOTICE.md](NOTICE.md) para detalhes de atribuição.
