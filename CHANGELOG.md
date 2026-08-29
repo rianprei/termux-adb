@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.0.0] - 2026-08-29
+
+### Adicionado
+- Front-end unificado `adb` com roteamento automático do backend (termux-adb para OTG via termux-usb; adb nativo para wireless)
+- Watcher OTG (`adb-otg-watcher`) mantém cache de detecção em segundo plano (decisão de roteamento em ~1 ms)
+- Front-end `fastboot` encaminhando para `termux-fastboot`
+- Ferramentas: `adbs` (diagnóstico), `adbw` (wireless guiado), `adbmenu` (interface de menu), `adbpair`, `adbotg`, `adblocalhost`
+- Integração com scrcpy (espelhamento) e ADBash (shell Bash na sessão ADB)
+- Documentação estruturada em `docs/` (instalação, OTG, wireless, localhost, troubleshooting, segurança)
+- README reescrito com tabela de comparação ampliada e badges
+
+### Alterado
+- Substituídos os symlinks `adb`→`termux-adb` por front-ends em `$HOME/.local/bin` com roteamento automático
+- `termux-adb-update` passa a atualizar todos os scripts e front-ends
+- `termux-adb-doctor` passa a checar os front-ends e o watcher
+
 ## [3.2.0] - 2026-08-06
 
 ### Corrigido

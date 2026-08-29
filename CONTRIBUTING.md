@@ -1,20 +1,24 @@
 # Contribuindo
 
-Issues e PRs sao bem-vindos.
+Issues e pull requests são bem-vindos.
 
-## Reportar problema
+## Reportar um problema
 
 Abra uma issue com:
-- Output de `termux-adb-doctor`
-- Arquitetura (`uname -m`)
-- Versao do Termux (`apt list --installed 2>/dev/null | grep termux-tools`)
 
-## Pull Requests
+- Output de `termux-adb-doctor` (diagnóstico completo);
+- Arquitetura (`uname -m`);
+- Versão do Termux (`apt list --installed 2>/dev/null | grep termux-tools`);
+- Passos para reproduzir, se aplicável.
 
-- Teste no Termux real antes de abrir PR
-- Mantenha `set -e` em todos os scripts
-- Atualize CHANGELOG.md
+## Enviar um pull request
 
-## Licenca
+- Teste no Termux real antes de abrir o PR;
+- Mantenha `set -e` em todos os scripts;
+- Atualize o `CHANGELOG.md`;
+- Atualize a documentação em `docs/` se o comportamento público mudar;
+- Mantenha a compatibilidade com `aarch64` e `arm`.
 
-Ao contribuir, voce concorda que suas contribuicoes serao licenciadas sob MIT.
+## Licença
+
+Ao contribuir, você concorda que suas contribuições serão licenciadas sob MIT.

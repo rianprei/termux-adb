@@ -1,20 +1,18 @@
 #!/data/data/com.termux/files/usr/bin/bash
-set -e
+#
+# adbw — conexão wireless interativa (Android 11+)
+# Inclui pareamento com código e conexão subsequente.
+# Porta de pareamento ≠ porta de conexão (consulte a tela de depuração wireless).
 
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+set -uo pipefail
 
-info()  { echo -e "${GREEN}[*]${NC} $1"; }
-warn()  { echo -e "${YELLOW}[!]${NC} $1" >&2; }
-fail()  { echo -e "${RED}[✗]${NC} $1" >&2; exit 1; }
-step()  { echo -e "${BLUE}[>]${NC} $1"; }
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; BLUE='\033[0;34m'; NC='\033[0m'
 
-PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+info() { echo -e "${GREEN}[*]${NC} $1"; }
+fail() { echo -e "${RED}[✗]${NC} $1" >&2; exit 1; }
+step() { echo -e "${BLUE}[>]${NC} $1"; }
 
-command -v termux-adb >/dev/null 2>&1 || fail "termux-adb não instalado. Execute install.sh primeiro."
+command -v adb >/dev/null 2>&1 || fail "adb ausente — instale: pkg install android-tools"
 
 validate_addr() {
   echo "$1" | grep -qE '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,5}$' || fail "Formato inválido: '$1'. Use IP:PORTA (ex: 192.168.1.100:37123)"
@@ -42,7 +40,7 @@ if [ "$PAIRED" != "s" ] && [ "$PAIRED" != "S" ]; then
   read -rp "Código de pareamento (6 dígitos): " PAIR_CODE
   [ -z "$PAIR_CODE" ] && fail "O código não pode ser vazio"
   info "Pareando..."
-  timeout 15 termux-adb pair "$PAIR_ADDR" "$PAIR_CODE" || fail "Pareamento falhou (timeout de 15s ou credenciais incorretas)"
+  timeout 15 adb pair "$PAIR_ADDR" "$PAIR_CODE" || fail "Pareamento falhou (timeout de 15s ou credenciais incorretas)"
   info "Pareamento concluído"
 fi
 
@@ -51,9 +49,11 @@ read -rp "IP:porta de conexão (porta de conexão, na tela principal de depuraç
 validate_addr "$CONNECT_ADDR"
 
 step "Conectando..."
-timeout 15 termux-adb connect "$CONNECT_ADDR" || fail "Conexão falhou (timeout de 15s). Verifique IP/porta e se a depuração wireless está ativa."
+timeout 15 adb connect "$CONNECT_ADDR" || fail "Conexão falhou (timeout de 15s). Verifique IP/porta e se a depuração wireless está ativa."
 
 echo
 info "Conectado. Dispositivos:"
-termux-adb devices
+adb devices
 echo
+echo "Observação: se o dispositivo ficar offline, execute 'adb kill-server' e reconecte."
+echo "            A porta de conexão muda a cada reinicialização; o pareamento é único."

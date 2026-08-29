@@ -9,8 +9,10 @@ NC='\033[0m'
 info()  { echo -e "${GREEN}[*]${NC} $1"; }
 step()  { echo -e "${BLUE}[>]${NC} $1"; }
 
+PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+
 echo
-info "termux-adb uninstaller v3.1.0"
+info "Termux ADB Unificado — desinstalador v4.0.0"
 echo
 
 step "Removendo pacote termux-adb..."
@@ -20,12 +22,23 @@ step "Limpando restos de apt (se existirem)..."
 rm -f "$PREFIX/etc/apt/sources.list.d/termux-adb.list"
 rm -f "$PREFIX/etc/apt/trusted.gpg.d/nohajc.gpg"
 
-step "Removendo symlinks e ferramentas extras..."
-rm -f "$PREFIX/bin/adb"
-rm -f "$PREFIX/bin/fastboot"
+step "Removendo ferramentas extras..."
 rm -f "$PREFIX/bin/wireless-adb"
 rm -f "$PREFIX/bin/termux-adb-doctor"
 rm -f "$PREFIX/bin/termux-adb-update"
+rm -f "$PREFIX/bin/adbotg"
+rm -f "$PREFIX/bin/adbpair"
+rm -f "$PREFIX/bin/adbw"
+rm -f "$PREFIX/bin/adblocalhost"
+rm -f "$PREFIX/bin/adbs"
+rm -f "$PREFIX/bin/adbmenu"
+
+step "Removendo front-ends unificados e watcher..."
+rm -f "$HOME/.local/bin/adb"
+rm -f "$HOME/.local/bin/fastboot"
+rm -f "$HOME/.local/bin/adb-otg-watcher"
+rm -f "$PREFIX/bin/adb.sh"
+rm -f "$PREFIX/bin/fastboot.sh"
 
 step "Limpando config dos shell RCs..."
 for RC in "$HOME/.bashrc" "$HOME/.zshrc"; do
@@ -38,9 +51,9 @@ step "Removendo dados isolados..."
 rm -rf "$HOME/.termux-adb"
 
 echo
-if command -v termux-adb >/dev/null 2>&1; then
-  echo -e "${RED}[!]${NC} termux-adb ainda no PATH — remocao pode ter falhado parcialmente"
+if command -v termux-adb >/dev/null 2>&1 && [ ! -f "$HOME/.local/bin/adb" ]; then
+  echo -e "${RED}[!]${NC} termux-adb ainda está no PATH — a remoção pode ter falhado parcialmente"
 else
-  info "termux-adb removido completamente"
+  info "termux-adb e ferramentas associadas removidos"
 fi
 echo
