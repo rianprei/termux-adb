@@ -1,6 +1,0 @@
-id=termuxadb_rootport
-name=termux-adb: Porta Fixa Root
-version=v1.0
-versionCode=1
-author=rianprei
-description=Fixa persist.adb.tcp.port em 5555 no boot (post-fs-data), sem toggle, sem porta aleatoria TLS. Fallback automatico pra resetprop se SELinux negar o setprop direto. Parte do projeto termux-adb.
