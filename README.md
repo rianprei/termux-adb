@@ -123,12 +123,53 @@ Exibe versões de backend, estado do `termux-usb`, variáveis de ambiente e a li
 | `wireless-adb`        | `$PREFIX/bin`     | Assistente interativo de conexão wireless (usa `termux-adb`). |
 | `adbotg`              | `$PREFIX/bin`     | Lista dispositivos USB OTG via `termux-usb -l`. |
 | `adbpair`             | `$PREFIX/bin`     | Pareamento rápido por código. |
-| `adbw`                | `$PREFIX/bin`     | Conexão wireless interativa. |
+| `adbw`                | `$PREFIX/bin`     | Conexão wireless interativa; `adbw --watch [IP] [PORTA]` mantém a sessão viva com reconexão automática. |
+| `adbw-root-porta`     | `$PREFIX/bin`     | Porta fixa de ADB via root (persist.adb.tcp.port, default 5555). |
+| `adbw-sweep`          | `$PREFIX/bin`     | Descoberta de porta dinâmica sem root via nmap (32768-60999). |
+| `adb-keys-backup`     | `$PREFIX/bin`     | Backup/restore das chaves RSA de host (~/.termux-adb). |
 | `adblocalhost`        | `$PREFIX/bin`     | Depuração do próprio aparelho (`127.0.0.1`). |
 | `adbs`                | `$PREFIX/bin`     | Status geral do sistema ADB (diagnóstico rápido). |
 | `adbmenu`             | `$PREFIX/bin`     | Menu interativo das ferramentas ADB. |
 | `termux-adb-doctor`   | `$PREFIX/bin`     | Diagnóstico completo do ambiente. |
 | `termux-adb-update`   | `$PREFIX/bin`     | Auto-updater de scripts e pacote. |
+
+## Modo root: módulo Magisk
+
+O módulo **`magisk-module/`** (id `termuxadb_rootport`) resolve de vez o principal atrito do wireless debugging em Android 11+: **a porta de conexão TLS aleatória que muda a cada boot e o toggle que se desliga sozinho**.
+
+### O que ele faz
+
+No boot (gancho `post-fs-data`, antes do Android terminar de subir), o módulo grava `persist.adb.tcp.port=5555`:
+
+- **`setprop` direto** — caminho oficial AOSP (o adbd lê `persist.adb.tcp.port` com fallback para `service.adb.tcp.port`, `daemon/main.cpp:275-277`);
+- **fallback automático `resetprop`** do Magisk se o SELinux negar o setprop (comportamento esperado em builds novos — ver `docs/SEGURANCA.md` e `context/termux-adb-research.md` §10.1);
+- log de execução em `/data/local/tmp/termuxadb_rootport.log`.
+
+Resultado: **ADB escutando fixo na porta 5555, sempre ligado, zero interação manual, sobrevive a reboot** (testado ao vivo no lake/POCO C75, HyperOS). Não existe mais porta aleatória pra descobrir — o `adbw --watch` passa a tentar sempre `IP:5555` primeiro.
+
+### Instalação
+
+Via adb/terminal:
+
+```bash
+adb push magisk-module /data/local/tmp/termuxadb_rootport
+su -c "magisk --install-module /data/local/tmp/termuxadb_rootport"
+```
+
+Ou pelo app Magisk: **Módulos → Install from storage** → selecione o zip do módulo (empacote a pasta `magisk-module/`). Reboot necessário para o gancho `post-fs-data` rodar.
+
+### Verificação
+
+```bash
+getprop persist.adb.tcp.port          # deve retornar 5555
+adb connect <IP-do-aparelho>:5555     # de qualquer host da rede
+```
+
+Ou rode `termux-adb-doctor` — ele detecta o módulo instalado.
+
+### Aviso
+
+A porta fixa 5555 é **plaintext + autenticação RSA** (não é o TLS do wireless A11+). Use somente em rede confiável — ver `docs/SEGURANCA.md`.
 
 ## Como funciona
 
@@ -180,6 +221,8 @@ Remove o pacote, ferramentas extras, front-ends e watcher, as linhas de configur
 ## Limitações
 
 A **enumeração do serial** via `libusb`/`termux-usb` é lenta. No `adb`, o impacto é mitigado pelo daemon, que varre periodicamente os dispositivos; já o `fastboot`, por não possuir daemon em background, torna a operação perceptivelmente lenta. Leve os timeouts em consideração ao operar no modo fastboot.
+
+O `adb` do Termux **conectando nele mesmo** (mesmo aparelho, via IP da LAN ou `127.0.0.1`) fica preso em `unauthorized` — o diálogo de autorização RSA nunca aparece na tela e o `logcat` não mostra nenhum evento de `AdbDebuggingManager`/RSA sendo processado. Confirmado em testes reais (LAN e loopback, com reautenticação forçada via `kill-server`) num device Android 16/HyperOS: o `adbd` no modo clássico `tcpip` (porta fixa, não a TLS de "Depuração sem fio") simplesmente não dispara esse fluxo pra conexões que se originam do próprio aparelho. Não é bug do `adbw` — o script reporta a falha de transporte corretamente. Afeta só o caso self-connect; conectar a partir de outro host (PC, outro celular) funciona normalmente e mostra o prompt.
 
 ## Créditos
 

@@ -77,3 +77,13 @@
 ### Adicionado
 - `install.sh`: `set -e`, checagem de arquitetura, auto-instalação de `termux-api`
 - `uninstall.sh`: remove pacote, repo list e GPG key
+
+## v4.1.0 (2026-09-15) — wireless sem atrito (termux-adb-research §12.5)
+
+- **magisk-module/** (termuxadb_rootport v1.0, testado ao vivo no lake 2x): porta fixa 5555 no boot (post-fs-data), setprop → fallback resetprop, log em /data/local/tmp/termuxadb_rootport.log. Zero interação, sobrevive a reboot.
+- **`adbw --watch [IP] [PORTA]`**: reconexão automática com backoff 3s→30s, estado em ~/.cache/adbw-state; detecta o módulo Magisk via getprop e usa a porta fixa 5555 automaticamente.
+- **`adbw-root-porta [porta]`** (root, sem módulo): mesma técnica on-demand via su.
+- **`adbw-sweep <IP> [--dry]`** (sem root): descoberta de porta dinâmica via nmap 32768-60999 — substitui `adb mdns`, ausente no android-tools do Termux (build nmeum: MDNS=OFF).
+- **`adb-keys-backup`**: backup/restore tar.gz das chaves RSA de host (~/.termux-adb), perms 600/644.
+- **doctor**: novos checks — módulo Magisk (instalado? prop ativa?), phantom process killer, mDNS ausente (esperado), chaves de host.
+- test/test-watch.sh: suite host-side do --watch com stubs (6 checks).

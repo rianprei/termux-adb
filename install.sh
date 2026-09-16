@@ -23,7 +23,7 @@ DEB_SHA256[aarch64]="3f571ada3ea25671ab8a6d227c5f12f7e0412d8b62bf60e7948ae99a4c3
 DEB_SHA256[arm]="faf1ec047fa69dbafc9550574bdf4c91bc7c12c5372684d6c5d9cbe384e861a0"
 
 # Scripts instalados no PATH (prefixo .sh removido)
-EXTRA_SCRIPTS="wireless-adb termux-adb-doctor termux-adb-update adbotg adbpair adbw adblocalhost adbs adbmenu"
+EXTRA_SCRIPTS="wireless-adb termux-adb-doctor termux-adb-update adbotg adbpair adbw adbw-root-porta adbw-sweep adb-keys-backup adblocalhost adbs adbmenu"
 # Scripts instalados em $HOME/.local/bin (front-ends do adb unificado)
 LOCALBIN_SCRIPTS="adb fastboot adb-otg-watcher"
 
@@ -148,6 +148,6 @@ fi
 
 echo
 info "Instalação concluída!"
-info "Comandos: adb, fastboot, adbw, adbmenu, adbs, adbpair, adbotg, adblocalhost, wireless-adb, termux-adb-doctor, termux-adb-update"
+info "Comandos: adb, fastboot, adbw (--watch), adbw-root-porta, adbw-sweep, adb-keys-backup, adbmenu, adbs, adbpair, adbotg, adblocalhost, wireless-adb, termux-adb-doctor, termux-adb-update"
 info "Distribuição própria — binários hospedados no nosso repositório."
 echo

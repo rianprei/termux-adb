@@ -1,0 +1,4 @@
+[0;32m[*][0m watch iniciado: addr=192.0.2.10:40123 (estado em /tmp/claude-1000/-home-rianprei-Documentos-mods-tabs-agent-os/98b09acc-de84-4ff0-b26b-acec0b344a0e/scratchpad/termux-adb/test/home/.cache/adbw-state)
+[0;32m[*][0m Ctrl+C encerra. Backoff 3s→30s
+[0;32m[*][0m sem transporte device (falha #1) — tentando reconnect em 192.0.2.10:40123...
+[0;32m[*][0m reconectado em 192.0.2.10:40123 ✓

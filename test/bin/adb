@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+S="$(dirname "$0")/../connected"
+case "$1" in
+  devices)
+    echo "List of devices attached"
+    [ -f "$S" ] && echo "127.0.0.1:40123	device product:fake"
+    echo ""
+    ;;
+  connect)
+    ADDR="$2"
+    if [ "$ADDR" = "192.0.2.10:40123" ]; then
+      touch "$S"; echo "connected to $ADDR"
+    else
+      echo "cannot connect to $ADDR" >&2; exit 1
+    fi
+    ;;
+  *) exit 0 ;;
+esac
