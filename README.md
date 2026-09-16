@@ -1,6 +1,6 @@
 # Termux ADB Unificado
 
-ADB e Fastboot no Termux **sem root** e **sem abrir o bootloader**.
+ADB e Fastboot no Termux **sem root** e **sem desbloquear o bootloader**.
 
 [![versão-4.0.0](https://img.shields.io/badge/vers%C3%A3o-4.0.0-blue)](https://github.com/rianprei/termux-adb/releases/tag/v4.0.0)
 [![licença-MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green)](LICENSE)
