@@ -3,3 +3,6 @@
 *~
 .DS_Store
 release-assets/
+test/connected
+test/home/
+test/*.log
